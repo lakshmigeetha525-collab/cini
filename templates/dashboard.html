@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CineBooker | Home</title>
+    <style>
+        :root { --red: #ff0000; --green: #00ff00; --dark: #050505; }
+        body { background: var(--dark); color: white; font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 50px 20px; }
+        
+        h1 { color: var(--red); font-size: 3.5rem; letter-spacing: 12px; margin-bottom: 60px; text-shadow: 0 0 20px var(--red); font-weight: 900; }
+        
+        .selection-box { width: 100%; max-width: 1000px; text-align: center; margin-bottom: 80px; }
+        .label-text { color: var(--green); font-weight: bold; letter-spacing: 3px; font-size: 1.1rem; display: block; margin: 50px 0 25px; }
+        
+        .btn-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin-bottom: 40px; }
+        .choice-btn { background: #111; border: 2px solid #333; color: white; padding: 14px 40px; border-radius: 50px; cursor: pointer; transition: 0.4s; font-weight: 600; font-size: 1.05rem; }
+        .choice-btn:hover, .choice-btn.active { border-color: var(--red); box-shadow: 0 0 15px var(--red); background: rgba(255,0,0,0.1); transform: scale(1.05); }
+
+        .movie-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 300px); 
+            gap: 40px; 
+            margin-top: 50px; justify-content: center;
+            width: 100%;
+        }
+
+        .movie-card { 
+            background: #0c0c0c; border-radius: 20px; overflow: hidden; 
+            border: 2.5px solid #1a1a1a; transition: 0.5s ease; position: relative;
+            display: flex; flex-direction: column;
+        }
+        .movie-card:hover { border-color: var(--red); transform: translateY(-15px); box-shadow: 0 0 30px rgba(255,0,0,0.3); }
+        
+        .movie-card img { 
+            width: 100%; 
+            height: 700px !important; 
+            min-height: 700px;
+            object-fit: cover; 
+            border-bottom: 2px solid #222; 
+            display: block;
+        }
+
+        .rating-badge { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.85); padding: 6px 12px; border-radius: 12px; color: gold; font-weight: bold; border: 1.5px solid gold; z-index: 10; font-size: 0.9rem; }
+        
+        .movie-info { padding: 20px; text-align: center; background: #080808; flex-grow: 1; }
+        .movie-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 15px; letter-spacing: 1px; color: #fff; }
+        
+        .book-btn { 
+            background: var(--red); color: white; border: none; padding: 12px; 
+            border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; 
+            transition: 0.3s; font-size: 1.1rem;
+        }
+        .book-btn:hover { background: #ff3333; transform: scale(1.02); }
+
+        .hidden { display: none; }
+        .fade-in { animation: fadeIn 0.8s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <h1>CINE BOOKER</h1>
+
+    <div class="selection-box">
+        <span class="label-text">🔴 SELECT DISTRICT</span>
+        <div class="btn-group">
+            {% for dist in locations.keys() %}
+            <button class="choice-btn dist-btn" onclick="selectDistrict(this, '{{ dist }}')">{{ dist }}</button>
+            {% endfor %}
+        </div>
+
+        <div id="city-sec" class="hidden fade-in">
+            <span class="label-text">🔴 SELECT CITY</span>
+            <div id="city-btns" class="btn-group"></div>
+        </div>
+
+        <div id="theatre-sec" class="hidden fade-in">
+            <span class="label-text">🔴 SELECT THEATRE</span>
+            <div id="theatre-btns" class="btn-group"></div>
+        </div>
+    </div>
+
+    <div id="movie-sec" class="hidden fade-in">
+        <h2 style="font-size: 2.5rem; color: #fff; margin-bottom: 50px; text-shadow: 0 0 10px var(--red); text-align: center;">NOW SHOWING</h2>
+        <div class="movie-grid"></div>
+    </div>
+
+    <script>
+       // Pazhayadhu: const data = {{ locations | tojson }};
+// Ippo idhu maari mathunga:
+const data = JSON.parse('{{ locations | tojson | safe }}');
+const movieImgs = JSON.parse('{{ movie_imgs | tojson | safe }}');
+        let currentDist = "";
+        let currentCity = "";
+
+        // --- DYNAMIC REAL DATE CALCULATION ---
+        function getTodayDate() {
+            const d = new Date();
+            const day = d.getDate();
+            const month = d.toLocaleString('en-US', { month: 'short' });
+            return `${day} ${month}`; // Example: "25 Jan"
+        }
+
+        function selectDistrict(btn, dist) {
+            document.querySelectorAll('.dist-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentDist = dist;
+            document.getElementById('city-sec').classList.remove('hidden');
+            document.getElementById('theatre-sec').classList.add('hidden');
+            document.getElementById('movie-sec').classList.add('hidden');
+            
+            const cityDiv = document.getElementById('city-btns');
+            cityDiv.innerHTML = "";
+            Object.keys(data[dist]).forEach(city => {
+                cityDiv.innerHTML += `<button class="choice-btn city-btn" onclick="selectCity(this, '${city}')">${city}</button>`;
+            });
+        }
+
+        function selectCity(btn, city) {
+            document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCity = city;
+            document.getElementById('theatre-sec').classList.remove('hidden');
+            document.getElementById('movie-sec').classList.add('hidden');
+            
+            const thDiv = document.getElementById('theatre-btns');
+            thDiv.innerHTML = "";
+            Object.keys(data[currentDist][city]).forEach(th => {
+                thDiv.innerHTML += `<button class="choice-btn th-btn" onclick="revealMovies(this, '${th}')">${th}</button>`;
+            });
+        }
+
+        function revealMovies(btn, theatreName) {
+            document.querySelectorAll('.th-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const movieGrid = document.querySelector('.movie-grid');
+            movieGrid.innerHTML = "";
+            
+            const movies = data[currentDist][currentCity][theatreName];
+            const movieData = {
+                "Amaran": { price: "190", rating: "9.2" },
+                "Pushpa 2": { price: "210", rating: "8.9" },
+                "Vidaamuyarchi": { price: "190", rating: "9.0" },
+                "Kanguva": { price: "250", rating: "8.5" },
+                "Greatest of All Time": { price: "200", rating: "8.8" },
+                "Leo": { price: "190", rating: "9.1" },
+                "Jailer": { price: "180", rating: "8.7" },
+                "Baahubali": { price: "220", rating: "9.5" },
+                "Vikram": { price: "200", rating: "9.3" }
+            };
+
+            const dynamicDate = getTodayDate(); // Gets fresh date on every click
+
+            movies.forEach(movie => {
+                const info = movieData[movie] || { price: "150", rating: "8.0" };
+                movieGrid.innerHTML += `
+                <div class="movie-card fade-in">
+                    <div class="rating-badge">⭐ ${info.rating}</div>
+                    <img src="${movieImgs[movie]}" alt="${movie}">
+                    <div class="movie-info">
+                        <div class="movie-title">${movie.toUpperCase()}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; margin-bottom:15px;">
+                            <span style="font-size:1.8rem; font-weight:900; color:var(--green);">₹${info.price}</span>
+                        </div>
+                        <button class="book-btn" onclick="location.href='/booking/${movie}?dist=${currentDist}&city=${currentCity}&theatre=${encodeURIComponent(theatreName)}&date=${dynamicDate}'">BOOK NOW</button>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('movie-sec').classList.remove('hidden');
+            
+            setTimeout(() => {
+                window.scrollTo({ top: document.getElementById('movie-sec').offsetTop - 50, behavior: 'smooth' });
+            }, 100);
+        }
+    </script>
+</body>
+</html>

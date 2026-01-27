@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking | {{ movie_name }}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --red: #ff0000; --green: #00ff00; --blue: #0088ff; --pink: #ff66b2; --dark: #050505; --grey: #444; }
+        body { background: var(--dark); color: white; font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; padding-bottom: 150px; }
+        .header-container { text-align: center; margin-bottom: 20px; }
+        .theater-name { color: var(--green); font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; margin: 0; font-weight: bold; }
+        .movie-name { color: white; font-size: 2.5rem; font-weight: 900; text-transform: uppercase; margin: 5px 0; }
+        .stats-bar { display: flex; gap: 30px; background: #111; padding: 15px 40px; border-radius: 50px; border: 1px solid #333; margin-bottom: 30px; }
+        .selection-group { width: 100%; max-width: 600px; margin-bottom: 25px; }
+        .group-label { color: var(--green); font-weight: bold; margin-bottom: 10px; display: block; }
+        .btn-row { display: flex; gap: 12px; }
+        .opt-btn { background: #1a1a1a; border: 1px solid #333; color: white; padding: 10px 25px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .opt-btn.active { background: var(--red); border-color: var(--red); box-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        .main-layout { display: flex; gap: 50px; width: 100%; max-width: 1000px; margin-top: 20px; }
+        .screen { background: #fff; height: 6px; width: 100%; margin-bottom: 45px; box-shadow: 0 10px 25px rgba(255,255,255,0.2); }
+        .row { display: flex; gap: 10px; margin-bottom: 12px; justify-content: center; }
+        .seat { width: 38px; height: 38px; background: var(--grey); border: 1px solid #555; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        .seat.selected { background: var(--green) !important; color: black; font-weight: bold; }
+        .seat.booked-M { background: var(--blue) !important; cursor: not-allowed; color: white; }
+        .seat.booked-F { background: var(--pink) !important; cursor: not-allowed; color: white; }
+        .legend-side { background: #111; padding: 25px; border-radius: 15px; border: 1px solid #333; min-width: 220px; display: flex; flex-direction: column; gap: 18px; }
+        .leg-item { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; }
+        .box { width: 20px; height: 20px; border-radius: 4px; }
+        .footer { position: fixed; bottom: 0; width: 100%; background: #0c0c0c; padding: 20px; display: flex; justify-content: space-around; border-top: 2px solid var(--red); align-items: center; z-index: 1000; }
+        .confirm-btn { background: var(--red); color: white; border: none; padding: 15px 45px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center; }
+        .modal-card { background: #1a1a1a; padding: 30px; border-radius: 20px; text-align: center; border: 1px solid #333; }
+        .pay-input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; }
+        .done-btn { background: var(--green); color: black; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: 900; margin-top: 10px; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 255, 0, 0.2); }
+        .done-btn:hover { transform: scale(1.02); opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <p class="theater-name">{{ theatre }} | {{ city }}</p>
+        <h1 class="movie-name">{{ movie_name }}</h1>
+    </div>
+    <div class="stats-bar">
+        <div style="color: #ff0080;">Booked: <span id="bookedNum">0</span></div>
+        <div style="color: #00ffcc;">Available: <span id="availNum">0</span></div>
+    </div>
+    <div class="selection-group">
+        <span class="group-label">SELECT DATE</span>
+        <div class="btn-row" id="dateBtns"></div>
+    </div>
+    <div class="selection-group">
+        <span class="group-label">SELECT TIME</span>
+        <div class="btn-row">
+            <button class="opt-btn {% if selected_time == '10:30 AM' %}active{% endif %}" onclick="selOpt(this, 'time')">10:30 AM</button>
+            <button class="opt-btn {% if selected_time == '02:45 PM' %}active{% endif %}" onclick="selOpt(this, 'time')">02:45 PM</button>
+            <button class="opt-btn {% if selected_time == '06:15 PM' %}active{% endif %}" onclick="selOpt(this, 'time')">06:15 PM</button>
+        </div>
+    </div>
+    <div class="main-layout">
+        <div style="flex: 2;">
+            <div class="screen"></div>
+            <div id="seatContainer"></div>
+        </div>
+        <div class="legend-side">
+            <h3 style="color:var(--red); margin:0 0 10px 0;">LEGEND</h3>
+            <div class="leg-item"><div class="box" style="background:var(--grey);"></div> Unbooked</div>
+            <div class="leg-item"><div class="box" style="background:var(--green);"></div> Your Selection</div>
+            <div class="leg-item"><div class="box" style="background:var(--pink);"></div> Women Booked</div>
+            <div class="leg-item"><div class="box" style="background:var(--blue);"></div> Men Booked</div>
+        </div>
+    </div>
+    <div class="footer">
+        <div>
+            <div style="font-size:0.85rem; color:#888;">Seats: <span id="sCount" style="color:white;">0</span></div>
+            <div id="sTotal" style="font-size:1.5rem; font-weight:900; color:var(--green);">₹0</div>
+        </div>
+        <button class="confirm-btn" onclick="openPayment()">BOOK NOW</button>
+    </div>
+    <div id="gender-modal" class="modal">
+        <div class="modal-card" style="width: 280px;">
+            <h3 style="color:white; margin-bottom: 20px;">Who is sitting here?</h3>
+            <button onclick="setGender('M')" style="background:var(--blue); padding:12px; color:white; border:none; margin:8px; border-radius:8px; cursor:pointer; width:100px; font-weight:bold;">MALE</button>
+            <button onclick="setGender('F')" style="background:var(--pink); padding:12px; color:white; border:none; margin:8px; border-radius:8px; cursor:pointer; width:100px; font-weight:bold;">FEMALE</button>
+        </div>
+    </div>
+    <div id="payment-modal" class="modal">
+        <div class="modal-card" style="width: 350px; text-align: left;">
+            <h2 style="color: var(--green); margin-top: 0;">Secure Payment</h2>
+            <p style="color: #888;">Amount: <span id="payAmt" style="color: white; font-weight: bold;"></span></p>
+            <label style="font-size: 0.8rem; color: #888;">CHOOSE METHOD</label>
+            <select id="payType" onchange="toggleCard()" class="pay-input" style="background: #333;">
+                <option value="upi">UPI (GPay / PhonePe)</option>
+                <option value="card">Debit / Credit Card</option>
+            </select>
+            <div id="cardDiv" style="display:none;">
+                <input type="text" placeholder="Card Number" class="pay-input">
+                <div style="display:flex; gap:10px;">
+                    <input type="text" placeholder="MM/YY" class="pay-input">
+                    <input type="password" placeholder="CVV" class="pay-input">
+                </div>
+            </div>
+            <button onclick="processPayment()" id="pBtn" style="background: var(--red); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer;">PAY NOW</button>
+            <button onclick="closeModals()" style="background: none; border: none; color: #666; width: 100%; margin-top: 10px; cursor: pointer;">Cancel</button>
+        </div>
+    </div>
+    <div id="success-modal" class="modal">
+        <div style="background: white; color: black; border-radius: 20px; width: 350px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div style="background: var(--red); color: white; padding: 15px; text-align: center;">
+                <h3 style="margin: 0; letter-spacing: 2px;">TICKET CONFIRMED</h3>
+            </div>
+            <div id="ticket-area" style="padding: 20px; background: white;">
+                <p style="color: #888; font-size: 0.6rem; font-weight:bold; margin: 0;">THEATER</p>
+                <p style="margin: 2px 0 10px 0; font-size: 0.9rem; font-weight: bold;">{{ theatre }} | {{ city }}</p>
+                <p style="color: #888; font-size: 0.6rem; font-weight:bold; margin: 0;">MOVIE</p>
+                <h2 style="margin: 2px 0 15px 0; color: black;">{{ movie_name }}</h2>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                    <div><p style="color:#888; font-size:0.6rem; margin:0;">DATE</p><b id="ticketDate">{{ selected_date }}</b></div>
+                    <div><p style="color:#888; font-size:0.6rem; margin:0;">TIME</p><b>{{ selected_time }}</b></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #ccc; padding-top: 10px;">
+                    <div>
+                        <p style="color:#888; font-size:0.6rem; margin:0;">SEATS</p><b id="tSeats" style="color:var(--red); font-size: 1.2rem;"></b>
+                        <p style="color:#888; font-size:0.6rem; margin:10px 0 0 0;">TOTAL PAID</p><b id="tTotal" style="font-size: 1.1rem;"></b>
+                    </div>
+                    <div id="qrcode" style="border: 1px solid #eee; padding: 5px;"></div>
+                </div>
+            </div>
+            <div style="padding: 15px; background: #f1f1f1;">
+                <button onclick="downloadTicket()" style="background: #007bff; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; margin-bottom: 10px;">📩 SAVE TO GALLERY</button>
+                <button onclick="location.href='/dashboard'" style="background: black; color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; font-weight:bold;">BOOK ANOTHER</button>
+                <button onclick="location.href='/'" class="done-btn">DONE</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // CRITICAL FIX: Added JSON.parse and safe filter to remove red errors
+        const bookedData = JSON.parse('{{ booked_seats | tojson | safe }}');
+        const rows = ['A', 'B', 'C', 'D', 'E'];
+        let selectedSeats = [];
+        let pendingSeat = null;
+
+        function setupDates() {
+            const dateContainer = document.getElementById('dateBtns');
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedDateFromUrl = urlParams.get('date');
+            for(let i=0; i<3; i++) {
+                let d = new Date();
+                d.setDate(d.getDate() + i);
+                let dateStr = d.getDate() + " " + d.toLocaleString('en-US', { month: 'short' });
+                let btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                if (selectedDateFromUrl === dateStr || (i === 0 && !selectedDateFromUrl)) { btn.classList.add('active'); }
+                btn.innerText = dateStr;
+                btn.onclick = () => selOpt(btn, 'date');
+                dateContainer.appendChild(btn);
+            }
+        }
+
+        function init() {
+            setupDates();
+            const container = document.getElementById('seatContainer');
+            let bCount = 0;
+            rows.forEach(r => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row';
+                for(let i=1; i<=10; i++) {
+                    const sId = r + i;
+                    const seat = document.createElement('div');
+                    seat.className = 'seat';
+                    seat.innerText = sId;
+                    if(bookedData[sId]) {
+                        seat.classList.add('booked-' + bookedData[sId]);
+                        bCount++;
+                    } else {
+                        seat.onclick = () => {
+                            if(seat.classList.contains('selected')) {
+                                seat.classList.remove('selected');
+                                selectedSeats = selectedSeats.filter(s => s.id !== sId);
+                                updateUI();
+                            } else {
+                                pendingSeat = { el: seat, id: sId };
+                                document.getElementById('gender-modal').style.display = 'flex';
+                            }
+                        };
+                    }
+                    rowDiv.appendChild(seat);
+                }
+                container.appendChild(rowDiv);
+            });
+            document.getElementById('bookedNum').innerText = bCount;
+            document.getElementById('availNum').innerText = 50 - bCount;
+        }
+
+        function setGender(g) {
+            if(pendingSeat) {
+                pendingSeat.el.classList.add('selected');
+                selectedSeats.push({id: pendingSeat.id, gender: g});
+                updateUI();
+                document.getElementById('gender-modal').style.display = 'none';
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('sCount').innerText = selectedSeats.length;
+            document.getElementById('sTotal').innerText = '₹' + (selectedSeats.length * 190);
+        }
+
+        function openPayment() {
+            if(selectedSeats.length === 0) return alert("Please select seats!");
+            document.getElementById('payAmt').innerText = '₹' + (selectedSeats.length * 190);
+            document.getElementById('payment-modal').style.display = 'flex';
+        }
+
+        function toggleCard() {
+            document.getElementById('cardDiv').style.display = document.getElementById('payType').value === 'card' ? 'block' : 'none';
+        }
+
+        function processPayment() {
+            const btn = document.getElementById('pBtn');
+            btn.innerText = "Processing..."; btn.disabled = true;
+            fetch('/confirm_booking', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    movie: '{{ movie_name | safe }}', 
+                    seats: selectedSeats,
+                    date: '{{ selected_date | safe }}', 
+                    time: '{{ selected_time | safe }}'
+                })
+            }).then(res => res.json()).then(data => {
+                if(data.status === 'success') {
+                    document.getElementById('payment-modal').style.display = 'none';
+                    showTicket();
+                }
+            });
+        }
+
+        function showTicket() {
+            const seatList = selectedSeats.map(s => s.id).join(", ");
+            document.getElementById('tSeats').innerText = seatList;
+            document.getElementById('tTotal').innerText = '₹' + (selectedSeats.length * 190);
+            const tid = "TID-" + Date.now();
+            const date = '{{ selected_date | safe }}';
+            const time = '{{ selected_time | safe }}';
+            const downloadUrl = `${window.location.origin}/download_ticket_direct/${tid}?date=${date}&time=${time}&seats=${seatList}`;
+            document.getElementById('qrcode').innerHTML = "";
+            new QRCode(document.getElementById("qrcode"), { text: downloadUrl, width: 70, height: 70 });
+            document.getElementById('success-modal').style.display = 'flex';
+        }
+
+        function downloadTicket() {
+            const tid = "TID-" + Date.now();
+            const seatList = selectedSeats.map(s => s.id).join(", ");
+            const date = '{{ selected_date | safe }}';
+            const time = '{{ selected_time | safe }}';
+            window.location.href = `/download_ticket_direct/${tid}?date=${date}&time=${time}&seats=${seatList}`;
+        }
+
+        function selOpt(btn, type) {
+            let url = new URL(window.location.href);
+            url.searchParams.set(type, btn.innerText);
+            window.location.href = url.href;
+        }
+
+        function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
+        init();
+    </script>
+</body>
+</html>
