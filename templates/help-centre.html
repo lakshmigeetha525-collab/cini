@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineBooker | Help Centre</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #050505;
+            color: white;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.light-mode {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            color: #ff0000;
+            margin-bottom: 50px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        body.light-mode .page-title {
+            color: #ff3333;
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
+        }
+
+        .page-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 60px;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        body.light-mode .category-card {
+            background: linear-gradient(135deg, #f0f0f0, #e8e8e8);
+            border-color: #ddd;
+        }
+
+        .category-card:hover {
+            border-color: #ff0000;
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.2);
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-size: 1.4rem;
+            color: #ff0000;
+            margin-bottom: 10px;
+        }
+
+        body.light-mode .category-title {
+            color: #ff3333;
+        }
+
+        .category-desc {
+            opacity: 0.7;
+            font-size: 0.95rem;
+        }
+
+        .help-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #ff0000;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #ff0000;
+        }
+
+        body.light-mode .section-title {
+            color: #ff3333;
+            border-bottom-color: #ff3333;
+        }
+
+        .help-item {
+            background: #111;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #ff0000;
+            transition: 0.3s;
+        }
+
+        body.light-mode .help-item {
+            background: #f0f0f0;
+            border-left-color: #ff3333;
+        }
+
+        .help-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.1);
+        }
+
+        .help-item h3 {
+            color: #ff0000;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+
+        body.light-mode .help-item h3 {
+            color: #ff3333;
+        }
+
+        .help-item p {
+            line-height: 1.8;
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .help-item ul {
+            margin-left: 20px;
+            margin-top: 10px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        .help-item li {
+            margin-bottom: 8px;
+        }
+
+        .contact-section {
+            background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+            border: 2px solid #ff0000;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        body.light-mode .contact-section {
+            background: linear-gradient(135deg, #f0f0f0, #e8e8e8);
+            border-color: #ff3333;
+        }
+
+        .contact-section h2 {
+            color: #ff0000;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        body.light-mode .contact-section h2 {
+            color: #ff3333;
+        }
+
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .contact-item {
+            background: rgba(255, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ff0000;
+        }
+
+        body.light-mode .contact-item {
+            background: rgba(255, 51, 51, 0.05);
+            border-color: #ff3333;
+        }
+
+        .contact-item p {
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .contact-item a {
+            color: #ff0000;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        body.light-mode .contact-item a {
+            color: #ff3333;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .categories {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include Navbar -->
+    {% include 'navbar.html' %}
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1 class="page-title">📞 Help Centre</h1>
+        <p class="page-subtitle">Find answers to your questions and get support</p>
+
+        <!-- Category Cards -->
+        <div class="categories">
+            <div class="category-card" onclick="scrollTo('booking')">
+                <div class="category-icon">🎫</div>
+                <div class="category-title">Booking Tickets</div>
+                <div class="category-desc">How to book and manage tickets</div>
+            </div>
+            <div class="category-card" onclick="scrollTo('payment')">
+                <div class="category-icon">💳</div>
+                <div class="category-title">Payment & Pricing</div>
+                <div class="category-desc">Payment methods and pricing info</div>
+            </div>
+            <div class="category-card" onclick="scrollTo('cancellation')">
+                <div class="category-icon">❌</div>
+                <div class="category-title">Cancellation & Refunds</div>
+                <div class="category-desc">Modify, cancel or get refunds</div>
+            </div>
+            <div class="category-card" onclick="scrollTo('account')">
+                <div class="category-icon">👤</div>
+                <div class="category-title">Account & Security</div>
+                <div class="category-desc">Manage your account safely</div>
+            </div>
+            <div class="category-card" onclick="scrollTo('technical')">
+                <div class="category-icon">⚙️</div>
+                <div class="category-title">Technical Support</div>
+                <div class="category-desc">App or website issues</div>
+            </div>
+            <div class="category-card" onclick="scrollTo('other')">
+                <div class="category-icon">❓</div>
+                <div class="category-title">Other Questions</div>
+                <div class="category-desc">General information</div>
+            </div>
+        </div>
+
+        <!-- Booking Section -->
+        <div class="help-section" id="booking">
+            <h2 class="section-title">🎫 Booking Tickets</h2>
+
+            <div class="help-item">
+                <h3>How do I book a movie ticket?</h3>
+                <p>Follow these simple steps:</p>
+                <ul>
+                    <li>Log in to your CineBooker account</li>
+                    <li>Select your preferred district and city</li>
+                    <li>Choose a theatre and click on your favorite movie</li>
+                    <li>Select your preferred date and time</li>
+                    <li>Choose your desired seats from the seat map</li>
+                    <li>Review and confirm your booking</li>
+                    <li>Complete the payment</li>
+                </ul>
+            </div>
+
+            <div class="help-item">
+                <h3>Which theatres and cities are available?</h3>
+                <p>We currently operate in Chennai and Coimbatore with partnerships with major theatre chains including AGS Cinemas, PVR, KG Cinemas, and Cinepolis. More cities coming soon!</p>
+            </div>
+
+            <div class="help-item">
+                <h3>Can I book tickets for a group?</h3>
+                <p>Yes! You can book multiple tickets in one transaction. Simply select the number of tickets you need and choose seats for each person. For bookings of 10 or more tickets, special discounts may apply!</p>
+            </div>
+
+            <div class="help-item">
+                <h3>How much in advance can I book?</h3>
+                <p>You can book tickets up to 30 days in advance, allowing you to plan your movie outings well ahead.</p>
+            </div>
+        </div>
+
+        <!-- Payment Section -->
+        <div class="help-section" id="payment">
+            <h2 class="section-title">💳 Payment & Pricing</h2>
+
+            <div class="help-item">
+                <h3>What payment methods do you accept?</h3>
+                <p>We accept the following payment methods:</p>
+                <ul>
+                    <li>Credit Cards (Visa, Mastercard, American Express)</li>
+                    <li>Debit Cards</li>
+                    <li>Digital Wallets (Google Pay, Apple Pay)</li>
+                    <li>UPI (Unified Payments Interface)</li>
+                    <li>Net Banking</li>
+                </ul>
+            </div>
+
+            <div class="help-item">
+                <h3>Is my payment information secure?</h3>
+                <p>Yes! All transactions are encrypted using SSL technology and processed through PCI DSS compliant payment gateways. Your payment information is never stored on our servers.</p>
+            </div>
+
+            <div class="help-item">
+                <h3>Why is there a convenience fee?</h3>
+                <p>The convenience fee covers the cost of payment processing, security, and maintaining our online platform. Different payment methods may have different convenience fee rates.</p>
+            </div>
+
+            <div class="help-item">
+                <h3>Do you offer any discounts?</h3>
+                <p>Yes! We offer special discounts for group bookings (10+ tickets). Additionally, partner theatres may have their own special offers and promotions available during checkout.</p>
+            </div>
+        </div>
+
+        <!-- Cancellation Section -->
+        <div class="help-section" id="cancellation">
+            <h2 class="section-title">❌ Cancellation & Refunds</h2>
+
+            <div class="help-item">
+                <h3>Can I cancel my booking?</h3>
+                <p>Yes, you can cancel your booking anytime up to 30 minutes before the show starts. After that, cancellation is not allowed as the show is about to begin or has started.</p>
+            </div>
+
+            <div class="help-item">
+                <h3>What is your refund policy?</h3>
+                <p>Refund policy:</p>
+                <ul>
+                    <li>Cancel 30+ minutes before show: Full refund of ticket price</li>
+                    <li>Cancel within 30 minutes of show: 90% refund (10% processing fee)</li>
+                    <li>Refunds are processed within 3-5 business days</li>
+                </ul>
+            </div>
+
+            <div class="help-item">
+                <h3>Can I modify my booking?</h3>
+                <p>Yes! You can modify your booking (change date, time, or seats) up to 30 minutes before the show starts. Simply go to your bookings and click modify.</p>
+            </div>
+
+            <div class="help-item">
+                <h3>How long does a refund take?</h3>
+                <p>Refunds are credited to the original payment method within 3-5 business days. During weekends or holidays, processing may take longer.</p>
+            </div>
+        </div>
+
+        <!-- Account Section -->
+        <div class="help-section" id="account">
+            <h2 class="section-title">👤 Account & Security</h2>
+
+            <div class="help-item">
+                <h3>How do I create an account?</h3>
+                <p>Click on "Create Account" on the login page, enter your name, email, and password, and you're all set! You'll receive a confirmation email to verify your account.</p>
+            </div>
+
+            <div class="help-item">
+                <h3>How do I reset my password?</h3>
+                <p>Click "Forgot Password" on the login page, enter your email, and we'll send you a password reset link. Follow the instructions in the email to create a new password.</p>
+            </div>
+
+            <div class="help-item">
+                <h3>How do I update my profile?</h3>
+                <p>Go to your account settings (click on your profile name in the header) and edit your personal information. Remember to save your changes!</p>
+            </div>
+
+            <div class="help-item">
+                <h3>Is my data safe with CineBooker?</h3>
+                <p>Absolutely! We use industry-standard encryption and security protocols. Your personal and payment information is never shared with third parties without your consent.</p>
+            </div>
+        </div>
+
+        <!-- Technical Support Section -->
+        <div class="help-section" id="technical">
+            <h2 class="section-title">⚙️ Technical Support</h2>
+
+            <div class="help-item">
+                <h3>The website is not loading properly</h3>
+                <p>Try these solutions:</p>
+                <ul>
+                    <li>Clear your browser cache and cookies</li>
+                    <li>Try a different browser</li>
+                    <li>Disable browser extensions</li>
+                    <li>Check your internet connection</li>
+                    <li>Try again after some time</li>
+                </ul>
+            </div>
+
+            <div class="help-item">
+                <h3>I'm facing issues during payment</h3>
+                <p>If you experience payment issues:</p>
+                <ul>
+                    <li>Check if your payment method has sufficient balance</li>
+                    <li>Ensure your card is not expired</li>
+                    <li>Try a different payment method</li>
+                    <li>Contact your bank to check if they've blocked the transaction</li>
+                    <li>Contact our support team if issues persist</li>
+                </ul>
+            </div>
+
+            <div class="help-item">
+                <h3>The app keeps crashing</h3>
+                <p>Try these solutions:</p>
+                <ul>
+                    <li>Restart the app</li>
+                    <li>Check if you have the latest version installed</li>
+                    <li>Clear app cache from your device settings</li>
+                    <li>Restart your device</li>
+                    <li>Reinstall the app if problems persist</li>
+                </ul>
+            </div>
+
+            <div class="help-item">
+                <h3>I didn't receive a confirmation email</h3>
+                <p>Check your spam or promotions folder. If you still don't find it, contact our support team with your email address and we'll resend the confirmation.</p>
+            </div>
+        </div>
+
+        <!-- Other Section -->
+        <div class="help-section" id="other">
+            <h2 class="section-title">❓ Other Questions</h2>
+
+            <div class="help-item">
+                <h3>Do you have an app?</h3>
+                <p>Yes! CineBooker is available as a web platform and native mobile apps (iOS and Android). Download from your app store for a better mobile experience.</p>
+            </div>
+
+            <div class="help-item">
+                <h3>What are your operating hours?</h3>
+                <p>CineBooker is available 24/7 for online bookings. Our customer support team is available from 9 AM to 11 PM (IST) on all days.</p>
+            </div>
+
+            <div class="help-item">
+                <h3>Do you offer e-tickets or print tickets?</h3>
+                <p>Both! Your ticket is sent to your email immediately after booking. You can either print it or show the digital copy on your mobile at the theatre counter.</p>
+            </div>
+
+            <div class="help-item">
+                <h3>What is the policy for cancellation due to movie cancellation?</h3>
+                <p>If a theatre cancels a show, you'll be notified immediately. You can choose to reschedule for another show or get a full refund, no questions asked.</p>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="contact-section">
+            <h2>Still need help? Contact Us!</h2>
+            <p style="margin-bottom: 20px; opacity: 0.9;">Our support team is here to assist you</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <p><strong>📧 Email</strong></p>
+                    <p><a href="mailto:support@cinebooker.com">support@cinebooker.com</a></p>
+                </div>
+                <div class="contact-item">
+                    <p><strong>📞 Phone</strong></p>
+                    <p><a href="tel:1-800-CINE-BOOKER">1-800-CINE-BOOKER</a></p>
+                </div>
+                <div class="contact-item">
+                    <p><strong>🕐 Hours</strong></p>
+                    <p>9 AM - 11 PM (IST), Daily</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function scrollTo(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Load saved theme
+        window.addEventListener('load', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        });
+    </script>
+</body>
+</html>

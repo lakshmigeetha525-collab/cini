@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineBooker | About</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #050505;
+            color: white;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.light-mode {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            color: #ff0000;
+            margin-bottom: 50px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        body.light-mode .page-title {
+            color: #ff3333;
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #ff0000;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #ff0000;
+        }
+
+        body.light-mode .section-title {
+            color: #ff3333;
+            border-bottom-color: #ff3333;
+        }
+
+        .faq-item {
+            background: #111;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        body.light-mode .faq-item {
+            background: #f0f0f0;
+            border-color: #ddd;
+        }
+
+        .faq-question {
+            background: #1a1a1a;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+            color: #ff0000;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        body.light-mode .faq-question {
+            background: #e8e8e8;
+            color: #ff3333;
+        }
+
+        .faq-question:hover {
+            background: #ff0000;
+            color: white;
+        }
+
+        body.light-mode .faq-question:hover {
+            background: #ff3333;
+        }
+
+        .faq-toggle {
+            font-size: 1.5rem;
+            transition: 0.3s;
+        }
+
+        .faq-toggle.active {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 20px;
+            background: #0d0d0d;
+            color: #bbb;
+            display: none;
+            line-height: 1.8;
+            border-top: 1px solid #333;
+        }
+
+        body.light-mode .faq-answer {
+            background: #e8e8e8;
+            color: #666;
+            border-top-color: #ddd;
+        }
+
+        .faq-answer.active {
+            display: block;
+        }
+
+        .help-item {
+            background: #111;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff0000;
+        }
+
+        body.light-mode .help-item {
+            background: #f0f0f0;
+            border-left-color: #ff3333;
+        }
+
+        .help-item h3 {
+            color: #ff0000;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        body.light-mode .help-item h3 {
+            color: #ff3333;
+        }
+
+        .help-item p {
+            line-height: 1.8;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .faq-question {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include Navbar -->
+    {% include 'navbar.html' %}
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1 class="page-title">About CineBooker</h1>
+
+        <!-- FAQ Section -->
+        <div class="section">
+            <h2 class="section-title">❓ Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>What is CineBooker?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    CineBooker is an online movie ticket booking platform that allows you to book tickets for your favorite movies at various theatres in your city. We provide a seamless booking experience with competitive prices and instant confirmations.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Which cities does CineBooker operate in?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Currently, CineBooker operates in Chennai and Coimbatore. We are expanding to more cities soon. Stay tuned for updates on new city launches!
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>How early can I book tickets?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    You can book tickets up to 30 days in advance. This allows you to plan your movie outings well ahead and secure your preferred seats.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Is there a refund policy?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Yes! You can get a full refund if you cancel your booking at least 30 minutes before the show starts. Cancellations within 30 minutes of the show are subject to a processing fee of 10%.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Do you offer group discounts?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Yes! We offer special discounts for group bookings of 10 or more tickets. Please contact our support team to avail these offers.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>How do I get my ticket after booking?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Your booking confirmation and ticket details will be sent to your registered email immediately after booking. You can download and print the ticket or show the digital copy on your mobile at the theatre counter.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Can I modify my booking after purchasing?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Yes, you can modify your booking (change date, time, or seats) up to 30 minutes before the show starts. You cannot modify bookings within the 30-minute window.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>What payment methods do you accept?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    We accept all major credit cards, debit cards, digital wallets (Google Pay, Apple Pay), and UPI payments. All transactions are encrypted and secured with industry-standard security protocols.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Is my personal information safe?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    Absolutely! We use SSL encryption to protect all your personal and payment information. Your data is never shared with third parties without your consent.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Do you offer student or senior citizen discounts?</span>
+                    <span class="faq-toggle">▼</span>
+                </div>
+                <div class="faq-answer">
+                    We work with various theatres that offer student and senior citizen discounts. Please check with the specific theatre for available offers during the booking process.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FAQ Toggle
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const toggle = element.querySelector('.faq-toggle');
+            
+            answer.classList.toggle('active');
+            toggle.classList.toggle('active');
+        }
+
+        // Load saved theme
+        window.addEventListener('load', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        });
+    </script>
+</body>
+</html>

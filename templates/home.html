@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Booker | Dashboard</title>
+    <style>
+        body { background: #050505; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+
+        /* Simple Navigation Bar - Welcome and Logout only */
+        .header { 
+            background: #ff0000; 
+            padding: 15px 40px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .header h1 { 
+            font-size: 24px; 
+            margin: 0; 
+            font-weight: 800; 
+            letter-spacing: 2px;
+            color: white;
+        }
+
+        .nav-links { display: flex; align-items: center; gap: 20px; }
+        .user-greet { font-weight: 600; color: white; font-size: 16px; }
+        
+        .logout-btn { 
+            background: white; 
+            color: #ff0000; 
+            padding: 8px 18px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            transition: 0.3s;
+            font-size: 14px;
+        }
+        .logout-btn:hover { background: #eeeeee; transform: scale(1.05); }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        
+        .selection-container {
+            background: #111;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #ff0000;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        select { 
+            background: #222; 
+            color: white; 
+            border: 1px solid #444; 
+            padding: 12px; 
+            border-radius: 6px; 
+            width: 220px; 
+            outline: none;
+            cursor: pointer;
+        }
+        select:focus { border-color: #ff0000; }
+        select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .movies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; }
+        .movie-card { background: #1a1a1a; border-radius: 10px; overflow: hidden; border: 1px solid #333; transition: 0.4s; position: relative; }
+        .movie-card:hover { transform: scale(1.03); border-color: #ff0000; }
+        .movie-card img { width: 100%; height: 380px; object-fit: cover; }
+        .movie-info { padding: 15px; text-align: center; }
+        .movie-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .btn-book { display: block; width: 100%; padding: 12px; background: #ff0000; color: white; text-decoration: none; border: none; font-weight: bold; cursor: pointer; text-align: center; }
+
+        #no-movies { text-align: center; color: #666; width: 100%; display: none; margin-top: 50px; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>CINE BOOKER</h1>
+        <div class="nav-links">
+            <span class="user-greet">Welcome, {{ user_name }}!</span>
+            <a href="/logout" class="logout-btn">LOGOUT</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="selection-container">
+            <select id="districtSelect" onchange="updateCities()">
+                <option value="">Select District</option>
+                {% for dist in locations.keys() %}
+                    <option value="{{ dist }}">{{ dist }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="citySelect" onchange="updateTheatres()" disabled>
+                <option value="">Select City</option>
+            </select>
+
+            <select id="theatreSelect" onchange="displayMovies()" disabled>
+                <option value="">Select Theatre</option>
+            </select>
+        </div>
+
+        <h2 id="movie-heading" style="margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">Current Movies</h2>
+        <div id="no-movies">Please select a theatre to see available movies.</div>
+        <div class="movies-grid" id="moviesGrid">
+        </div>
+    </div>
+
+    <script>
+        const locations = JSON.parse('{{ locations | tojson | safe }}');
+        const movieImgs = JSON.parse('{{ movie_imgs | tojson | safe }}');
+
+        function updateCities() {
+            const dist = document.getElementById('districtSelect').value;
+            const citySelect = document.getElementById('citySelect');
+            const theatreSelect = document.getElementById('theatreSelect');
+            const grid = document.getElementById('moviesGrid');
+            const noMovies = document.getElementById('no-movies');
+            
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            theatreSelect.innerHTML = '<option value="">Select Theatre</option>';
+            theatreSelect.disabled = true;
+            grid.innerHTML = '';
+            noMovies.style.display = 'block';
+
+            if (dist) {
+                citySelect.disabled = false;
+                Object.keys(locations[dist]).forEach(city => {
+                    citySelect.innerHTML += `<option value="${city}">${city}</option>`;
+                });
+            } else {
+                citySelect.disabled = true;
+            }
+        }
+
+        function updateTheatres() {
+            const dist = document.getElementById('districtSelect').value;
+            const city = document.getElementById('citySelect').value;
+            const theatreSelect = document.getElementById('theatreSelect');
+            
+            theatreSelect.innerHTML = '<option value="">Select Theatre</option>';
+
+            if (city) {
+                theatreSelect.disabled = false;
+                Object.keys(locations[dist][city]).forEach(theatre => {
+                    theatreSelect.innerHTML += `<option value="${theatre}">${theatre}</option>`;
+                });
+            } else {
+                theatreSelect.disabled = true;
+            }
+        }
+
+        function displayMovies() {
+            const dist = document.getElementById('districtSelect').value;
+            const city = document.getElementById('citySelect').value;
+            const theatre = document.getElementById('theatreSelect').value;
+            const grid = document.getElementById('moviesGrid');
+            const noMovies = document.getElementById('no-movies');
+            
+            grid.innerHTML = '';
+            
+            if (theatre) {
+                const movies = locations[dist][city][theatre];
+                if (movies && movies.length > 0) {
+                    noMovies.style.display = 'none';
+                    movies.forEach(movie => {
+                        const imgPath = movieImgs[movie] || 'static/images/default.jpg';
+                        grid.innerHTML += `
+                            <div class="movie-card">
+                                <img src="${imgPath}" alt="${movie}" onerror="this.src='https://via.placeholder.com/300x450?text=${movie}'">
+                                <div class="movie-info">
+                                    <div class="movie-title">${movie}</div>
+                                </div>
+                                <button class="btn-book" onclick="bookMovie('${movie}')">BOOK NOW</button>
+                            </div>
+                        `;
+                    });
+                } else {
+                    noMovies.style.display = 'block';
+                    noMovies.innerText = "No movies found for this selection.";
+                }
+            } else {
+                noMovies.style.display = 'block';
+            }
+        }
+
+        function bookMovie(movieName) {
+            const dist = document.getElementById('districtSelect').value;
+            const city = document.getElementById('citySelect').value;
+            const theatre = document.getElementById('theatreSelect').value;
+            window.location.href = `/booking/${movieName}?dist=${dist}&city=${city}&theatre=${theatre}`;
+        }
+    </script>
+</body>
+</html>

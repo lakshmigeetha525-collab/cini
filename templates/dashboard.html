@@ -55,9 +55,45 @@
         .hidden { display: none; }
         .fade-in { animation: fadeIn 0.8s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Notification Toast Styles */
+        .notification-toast {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--red), #ff3333);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(255, 0, 0, 0.4);
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            z-index: 1000;
+            animation: slideDown 0.5s ease forwards, slideUp 0.5s ease forwards 3.5s;
+            pointer-events: none;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+        }
     </style>
 </head>
 <body>
+    {% include 'navbar.html' %}
+    {% if user_name %}
+    <div class="notification-toast">
+        Welcome back, {{ user_name }}! 🎬
+    </div>
+    {% endif %}
+    
     <h1>CINE BOOKER</h1>
 
     <div class="selection-box">

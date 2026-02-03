@@ -1,0 +1,314 @@
+<header class="navbar">
+    <div class="navbar-content">
+        <div class="navbar-left">
+            <button class="back-btn" id="backBtn" onclick="goBack()" style="display: none;">
+                ← Back
+            </button>
+            <div class="logo">🎬 CINE BOOKER</div>
+        </div>
+        <div class="navbar-right">
+            <button class="nav-item" onclick="showHelpCentre()">📞 Help Centre</button>
+            <button class="nav-item" onclick="showAbout()">📖 About</button>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+            <div class="profile-container">
+                <button class="profile-btn" onclick="toggleProfileMenu()">
+                    👤 {{ user_name }}
+                </button>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-item" onclick="toggleTheme()">🌓 Toggle Theme</div>
+                    <div class="dropdown-item" onclick="showAbout()">📖 About</div>
+                    <div class="dropdown-item" onclick="showHelpCentre()">📞 Help Centre</div>
+                    <div class="dropdown-item logout-btn" onclick="logout()">🚪 Logout</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<style>
+    /* Navbar Styles */
+    .navbar {
+        background: linear-gradient(135deg, #ff0000, #cc0000);
+        padding: 20px 40px;
+        box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    body.light-mode .navbar {
+        background: linear-gradient(135deg, #ff3333, #ff6666);
+    }
+
+    .navbar-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .navbar-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .back-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: white;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .navbar-right {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .nav-item {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .nav-item:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+
+    .theme-toggle {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+
+    .profile-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .profile-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+
+    .profile-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+
+    .profile-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: #1a1a1a;
+        border: 2px solid #ff0000;
+        border-radius: 8px;
+        min-width: 200px;
+        display: none;
+        flex-direction: column;
+        margin-top: 10px;
+        z-index: 1000;
+        box-shadow: 0 8px 24px rgba(255, 0, 0, 0.2);
+    }
+
+    body.light-mode .profile-dropdown {
+        background: #f0f0f0;
+        color: #333;
+        border-color: #ff3333;
+    }
+
+    .profile-dropdown.active {
+        display: flex;
+    }
+
+    .dropdown-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid #333;
+        cursor: pointer;
+        transition: 0.3s;
+        text-align: left;
+        color: white;
+    }
+
+    body.light-mode .dropdown-item {
+        border-bottom-color: #ddd;
+        color: #333;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+        background: #ff0000;
+        color: white;
+    }
+
+    body.light-mode .dropdown-item:hover {
+        background: #ff3333;
+        color: white;
+    }
+
+    .logout-btn {
+        color: #ff6666 !important;
+    }
+
+    .logout-btn:hover {
+        background: #ff6666 !important;
+        color: white !important;
+    }
+
+    @media (max-width: 768px) {
+        .navbar {
+            padding: 15px;
+        }
+
+        .navbar-content {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .navbar-right {
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+        }
+
+        .nav-item {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
+<script>
+    // Profile Menu Toggle
+    function toggleProfileMenu() {
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.classList.toggle('active');
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const profileContainer = document.querySelector('.profile-container');
+        if (profileContainer && !profileContainer.contains(event.target)) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+                dropdown.classList.remove('active');
+            }
+        }
+    });
+
+    // Theme Toggle
+    function toggleTheme() {
+        const body = document.body;
+        const btn = document.querySelector('.theme-toggle');
+        
+        if (body.classList.contains('light-mode')) {
+            body.classList.remove('light-mode');
+            btn.textContent = '🌙 Dark';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            body.classList.add('light-mode');
+            btn.textContent = '☀️ Light';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    // Load saved theme
+    window.addEventListener('load', function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+            const btn = document.querySelector('.theme-toggle');
+            if (btn) btn.textContent = '☀️ Light';
+        }
+    });
+
+    // Logout
+    function logout() {
+        window.location.href = '/logout';
+    }
+
+    // Show Help Centre
+    function showHelpCentre() {
+        window.location.href = '/help-centre';
+    }
+
+    // Show About
+    function showAbout() {
+        window.location.href = '/about';
+    }
+
+    // Go Back
+    function goBack() {
+        window.history.back();
+    }
+
+    // Show/Hide Back Button
+    function updateBackButton() {
+        const backBtn = document.getElementById('backBtn');
+        if (backBtn) {
+            if (window.location.pathname !== '/home') {
+                backBtn.style.display = 'inline-block';
+            } else {
+                backBtn.style.display = 'none';
+            }
+        }
+    }
+
+    // Update back button on page load
+    window.addEventListener('load', updateBackButton);
+</script>
