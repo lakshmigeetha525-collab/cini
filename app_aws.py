@@ -7,8 +7,8 @@ from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
 # AWS Elastic Beanstalk requires 'application' variable name
-application = Flask(__name__)
-application.secret_key = os.environ.get('SECRET_KEY', 'cine-booker-pangu-ultra-key')
+app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'cine-booker-pangu-ultra-key')
 
 # --- 1. AWS CONFIGURATION ---
 REGION = 'us-east-1' 
