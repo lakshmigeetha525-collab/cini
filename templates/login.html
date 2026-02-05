@@ -5,64 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cine Booker - Login</title>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; }
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; margin: 0; }
         .login-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
+        h2 { text-align: center; color: #333; }
         input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        #error-msg { color: red; font-size: 14px; margin-top: 10px; text-align: center; }
+        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #218838; }
+        #error-msg { color: #d9534f; font-size: 14px; margin-top: 10px; text-align: center; min-height: 20px; }
         .footer { margin-top: 15px; text-align: center; font-size: 14px; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
 <div class="login-container">
     <h2>Login</h2>
-    <form id="loginForm">
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="password" id="password" placeholder="Password" required>
+    
+    <form id="loginForm" action="/login" method="POST">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Login</button>
     </form>
-    <div id="error-msg"></div>
+
+    <div id="error-msg">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <p style="margin: 5px 0;">{{ message }}</p>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+    </div>
+
     <div class="footer">
         Don't have an account? <a href="/register">Register here</a>
     </div>
 </div>
-
-<script>
-    // Intha wrap thaan logic! Ellam load aanathum script run aagum.
-    document.addEventListener('DOMContentLoaded', () => {
-        const loginForm = document.getElementById('loginForm');
-        
-        if (loginForm) {
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const errorDiv = document.getElementById('error-msg');
-                
-                errorDiv.textContent = "Logging in..."; // Just for feedback
-
-                try {
-                    const response = await fetch('/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.status === 'success') {
-                        window.location.href = '/dashboard'; 
-                    } else {
-                        errorDiv.textContent = result.message || 'Login failed!';
-                    }
-                } catch (error) {
-                    errorDiv.textContent = 'Server error! Make sure Flask is running.';
-                }
-            });
-        }
-    });
-</script>
-
 </body>
 </html>
