@@ -20,7 +20,7 @@ users_table = dynamodb.Table('CineUsers')
 bookings_table = dynamodb.Table('CineBookings')
 
 # SNS Topic ARN (Indha ARN-a unga AWS Console-la irunthu yeduthu replace pannunga)
-SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:897722679886:aws_topic' 
+SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:535002883963:cine_booker' 
 
 # --- 2. STATIC DATA ---
 locations_data = {
