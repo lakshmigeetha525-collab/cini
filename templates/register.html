@@ -15,70 +15,35 @@
         button:hover { background: #cc0000; }
         button.secondary { background: #333; }
         button.secondary:hover { background: #444; }
-        .error { color: #ff6666; font-size: 14px; margin-top: 10px; font-weight: bold; }
-        .success { color: #66ff66; font-size: 14px; margin-top: 10px; font-weight: bold; }
+        .message-area { margin-top: 15px; font-size: 14px; font-weight: bold; }
+        .error { color: #ff6666; }
     </style>
 </head>
 <body>
     <div class="register-card">
         <h1>CREATE ACCOUNT</h1>
-        <form id="registerForm">
+        
+        <form id="registerForm" action="/register" method="POST">
             <input type="text" name="name" placeholder="Full Name" required>
             <input type="email" name="email" placeholder="Email ID" required>
             <input type="password" name="password" placeholder="Password" required>
-            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+            
             <div class="button-container">
                 <button type="submit">CREATE ACCOUNT</button>
                 <button type="button" class="secondary" onclick="window.location.href='/'">BACK</button>
             </div>
         </form>
-        <div id="message"></div>
+
+        <div class="message-area">
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <p class="error">{{ message }}</p>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+        </div>
     </div>
 
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.querySelector('input[name="name"]').value;
-            const email = document.querySelector('input[name="email"]').value;
-            const password = document.querySelector('input[name="password"]').value;
-            const confirm_password = document.querySelector('input[name="confirm_password"]').value;
-            const messageDiv = document.getElementById('message');
-            
-            // Password match check
-            if (password !== confirm_password) {
-                messageDiv.innerHTML = '<p class="error">Passwords do not match!</p>';
-                return;
-            }
-            
-            // Sending data to Flask
-            fetch('/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    password: password
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    messageDiv.innerHTML = '<p class="success">Account created successfully! Logging you in...</p>';
-                    // Redirecting to /dashboard after 2 seconds
-                    setTimeout(function() {
-                        window.location.href = '/dashboard'; 
-                    }, 2000);
-                } else {
-                    messageDiv.innerHTML = '<p class="error">' + data.message + '</p>';
-                }
-            })
-            .catch(error => {
-                messageDiv.innerHTML = '<p class="error">Error connecting to server!</p>';
-            });
-        });
-    </script>
-</body>
+    </body>
 </html>
