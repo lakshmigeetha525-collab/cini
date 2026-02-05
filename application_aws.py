@@ -6,53 +6,29 @@ import datetime
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
-# AWS Elastic Beanstalk requires 'application' variable name
 application = Flask(__name__)
+# It is better to use a random string for the secret key in production
 application.secret_key = os.environ.get('SECRET_KEY', 'cine-booker-pangu-ultra-key')
 
 # --- 1. AWS CONFIGURATION ---
 REGION = 'us-east-1' 
+
+# For local testing, you can pass keys here. 
+# For Beanstalk/EC2, leave it as is and use IAM Roles.
 dynamodb = boto3.resource('dynamodb', region_name=REGION)
 sns = boto3.client('sns', region_name=REGION)
 
-# DynamoDB Tables (Ensure these names match your AWS Console)
 users_table = dynamodb.Table('CineUsers')
 bookings_table = dynamodb.Table('CineBookings')
-
-# SNS Topic ARN (Indha ARN-a unga AWS Console-la irunthu yeduthu replace pannunga)
 SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:535002883963:cine_booker' 
 
-# --- 2. STATIC DATA ---
-locations_data = {
-    "Chennai": {
-        "Velachery": {"AGS Cinemas": ["Amaran", "Pushpa 2", "Vidaamuyarchi", "Kanguva"]},
-        "Anna Nagar": {"PVR Cinemas": ["Amaran", "Kanguva"]}
-    },
-    "Coimbatore": {
-        "RS Puram": {"Brookefields PVR": ["Amaran", "Pushpa 2", "Vidaamuyarchi"]},
-        "Avinashi Road": {"Broadway Cinemas": ["Pushpa 2", "Kanguva"]}
-    }
-}
-
-movie_images = {
-    "Amaran": "static/images/amaran.jpg",
-    "Pushpa 2": "static/images/pushpa2.jpg",
-    "Vidaamuyarchi": "static/images/vidamuyarchi.jpg",
-    "Kanguva": "static/images/kanguva.jpg"
-}
-
-# --- 3. HELPER FUNCTIONS (Sir's Logic) ---
 def send_notification(subject, message):
     try:
-        sns.publish(
-            TopicArn=SNS_TOPIC_ARN,
-            Subject=subject,
-            Message=message
-        )
-    except ClientError as e:
-        print(f"Error sending notification: {e}")
+        sns.publish(TopicArn=SNS_TOPIC_ARN, Subject=subject, Message=message)
+    except Exception as e:
+        print(f"SNS Error: {e}")
 
-# --- 4. ROUTES ---
+# --- 2. ROUTES ---
 
 @application.route('/')
 def index():
@@ -63,33 +39,32 @@ def index():
 @application.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # Using Form data as per Sir's logic
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
         
         try:
-            # Check if user exists
             res = users_table.get_item(Key={'email': email})
             if 'Item' in res:
                 flash("Email already registered!")
                 return redirect(url_for('register'))
             
-            # Insert new user
             users_table.put_item(Item={
-                'email': email,
-                'name': name,
-                'password': password
+                'email': email, 'name': name, 'password': password
             })
             
             session['username'] = name
             session['email'] = email
-            
-            send_notification("New CineBooker Signup", f"User {name} ({email}) has registered.")
+            send_notification("New Signup", f"User {name} joined.")
             return redirect(url_for('dashboard'))
             
+        except ClientError as e:
+            # This captures AWS credential/permission errors specifically
+            flash(f"AWS Error: {e.response['Error']['Message']}")
+            return redirect(url_for('register'))
         except Exception as e:
-            return f"Registration Error: {str(e)}"
+            flash(f"Registration Error: {str(e)}")
+            return redirect(url_for('register'))
             
     return render_template('register.html')
 
@@ -105,11 +80,10 @@ def login():
                 session['username'] = res['Item']['name']
                 session['email'] = email
                 send_notification("User Login", f"User {session['username']} logged in.")
-                return redirect(url_for('dashboard'))
             else:
                 flash("Invalid Credentials!")
         except Exception as e:
-            flash("Login failed!")
+            flash(f"Login Error: {str(e)}")
             
     return render_template('login.html')
 
@@ -117,10 +91,8 @@ def login():
 def dashboard():
     if 'username' not in session:
         return redirect(url_for('index'))
-    return render_template('home.html', 
-                           username=session['username'], 
-                           locations=locations_data, 
-                           movie_imgs=movie_images)
+    # Replace with your actual home.html
+    return render_template('home.html', username=session['username'])
 
 @application.route('/booking/<movie_name>')
 def booking(movie_name):
